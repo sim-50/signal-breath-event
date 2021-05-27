@@ -9,6 +9,7 @@
 <ion-content [fullscreen]="true">
   <div id="container">
     <ion-button
+      #button
       [ngStyle]="{'width' : width, 'height' : height, 'font-size' : title_fontsize}"
       fill="outline"
       (click)="onClick()">{{title}}</ion-button>

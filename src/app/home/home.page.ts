@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AnimationController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -6,15 +7,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
+  @ViewChild("button", { read: ElementRef, static: true }) button: ElementRef
+
   title: string = 'start';
   width: string = '250px';
   height: string = '250px';
   title_fontsize: string = '3.7rem';
-  secondCountDown: number = 3;
+  secondCountDown: number = 4;
   secondCount: number = 0;
   clock;
 
-  constructor() { }
+  constructor(private animationCtrl: AnimationController) { }
 
   ngOnInit() {
     if (window.screen.height < 667) { // iPhone 5/SE , Galaxy S5
@@ -45,8 +48,8 @@ export class HomePage implements OnInit {
   countDown = () => {
     return new Promise((resolve, reject) => {
       this.clock = setInterval(() => {
-        this.title = this.secondCountDown.toString();
         this.secondCountDown--;
+        this.title = this.secondCountDown.toString();
         if (this.secondCountDown === 0) {
           clearInterval(this.clock);
           resolve(this.secondCountDown);
@@ -58,7 +61,7 @@ export class HomePage implements OnInit {
   breathPeriod = async (value) => {
     // start breathe --> inhale first
     if (value === 0) {
-      while (this.secondCount <= 60) {
+      while (this.secondCount < 64) {
         await this.inhalePeriod().then(async () => {
           await this.exhalePeriod();
         })
@@ -69,37 +72,60 @@ export class HomePage implements OnInit {
   }
 
   inhalePeriod = () => {
+    console.log("inhale second:" + this.secondCount);
+    this.inhaleAnimation();
     return new Promise((resolve, reject) => {
+      this.title = 'Inhale';
       this.clock = setInterval(() => {
-        this.title = 'Inhale';
-        this.secondCount++;
+        this.secondCount = this.secondCount + 4;
         // this.title = this.secondCount.toString();
         if (this.secondCount % 4 === 0) {
           clearInterval(this.clock);
           resolve(this.secondCount);
         }
-      }, 1000);
+      }, 4000);
     })
   }
 
   exhalePeriod = () => {
-    // console.log("second go to exhale: " + second);
-    // console.log("second go to exhale: " + this.secondCount);
+    console.log("second go to exhale: " + this.secondCount);
+    this.exhaleAnimation();
     return new Promise((resolve, reject) => {
+      this.title = 'Exhale';
       this.clock = setInterval(() => {
-        this.title = 'Exhale';
-        this.secondCount++;
+        this.secondCount = this.secondCount + 4;
         // this.title = this.secondCount.toString();
         if (this.secondCount % 8 === 0) {
           clearInterval(this.clock);
           resolve(this.secondCount);
         }
-        if (this.secondCount === 61) {
+        if (this.secondCount === 64) {
           clearInterval(this.clock);
           this.title = 'Done';
         }
-      }, 1000);
+      }, 4000);
     })
   }
 
+  inhaleAnimation() {
+    const animation = this.animationCtrl.create()
+      .addElement(this.button.nativeElement)
+      .duration(4000)
+      .fromTo('transform', 'scale(1)', 'scale(1.3)')
+      .fromTo('opacity', '0.7', '1')
+      .fromTo('--border-width', '20px', '0px');
+
+    animation.play();
+  }
+
+  exhaleAnimation() {
+    const animation = this.animationCtrl.create()
+      .addElement(this.button.nativeElement)
+      .duration(4000)
+      .fromTo('transform', 'scale(1.3)', 'scale(1)')
+      .fromTo('opacity', '1', '0.7')
+      .fromTo('--border-width', '0px', '20px');
+
+    animation.play();
+  }
 }
