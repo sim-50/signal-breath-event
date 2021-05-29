@@ -9,7 +9,7 @@ import { AnimationController } from '@ionic/angular';
 export class HomePage implements OnInit {
   @ViewChild("button", { read: ElementRef, static: true }) button: ElementRef
 
-  title: string = 'start';
+  title: string = 'Start';
   width: string = '250px';
   height: string = '250px';
   title_fontsize: string = '3.7rem';
@@ -33,78 +33,55 @@ export class HomePage implements OnInit {
     }
   }
 
-  async onClick() {
+  onClick() {
     console.log('clicked!');
-    if (this.title === 'start') {
-      // countDown process: 3-2-1
-      this.countDown()
-        // breathe period: inhale - exhale
-        .then((value) => {
-          this.breathPeriod(value);
-        })
+    if (this.title === 'Start') {
+      this.allProcess();
+    } else if (this.title === 'Redo') {
+      this.secondCountDown = 4;
+      this.secondCount = 0;
+      this.allProcess();
     }
   }
 
-  countDown = () => {
-    return new Promise((resolve, reject) => {
-      this.clock = setInterval(() => {
-        this.secondCountDown--;
-        this.title = this.secondCountDown.toString();
-        if (this.secondCountDown === 0) {
-          clearInterval(this.clock);
-          resolve(this.secondCountDown);
-        }
-      }, 1000);
-    })
-  }
-
-  breathPeriod = async (value) => {
-    // start breathe --> inhale first
-    if (value === 0) {
-      while (this.secondCount < 64) {
-        await this.inhalePeriod().then(async () => {
-          await this.exhalePeriod();
-        })
+  allProcess = () => {
+    // countDown process: 3-2-1
+    this.clock = setInterval(() => {
+      this.secondCountDown--;
+      this.title = this.secondCountDown.toString();
+      if (this.secondCountDown === 0) {
+        clearInterval(this.clock);
+        // start breathe period
+        this.breathPeriod();
       }
-    }
-    // stop when secondCount === 60
-    // during this period: inhale 4s --> exhale 4s loop
+      console.log(this.secondCountDown);
+    }, 1000);
   }
 
-  inhalePeriod = () => {
-    console.log("inhale second:" + this.secondCount);
+  breathPeriod = () => {
+    // start breathe --> inhale first
     this.inhaleAnimation();
-    return new Promise((resolve, reject) => {
-      this.title = 'Inhale';
-      this.clock = setInterval(() => {
-        this.secondCount = this.secondCount + 4;
-        // this.title = this.secondCount.toString();
-        if (this.secondCount % 4 === 0) {
-          clearInterval(this.clock);
-          resolve(this.secondCount);
+    this.title = "Inhale";
+    let inhaleFlag: boolean = false;
+    this.clock = setInterval(() => {
+      this.secondCount = this.secondCount + 4;
+      // stop when secondCount === 64
+      if (this.secondCount >= 64) {
+        clearInterval(this.clock);
+        this.title = "Redo";
+      } else {
+        if (inhaleFlag === true) {
+          this.inhaleAnimation();
+          this.title = "Inhale";
+          inhaleFlag = false;
+        } else {
+          this.exhaleAnimation();
+          this.title = "Exhale";
+          inhaleFlag = true;
         }
-      }, 4000);
-    })
-  }
-
-  exhalePeriod = () => {
-    console.log("second go to exhale: " + this.secondCount);
-    this.exhaleAnimation();
-    return new Promise((resolve, reject) => {
-      this.title = 'Exhale';
-      this.clock = setInterval(() => {
-        this.secondCount = this.secondCount + 4;
-        // this.title = this.secondCount.toString();
-        if (this.secondCount % 8 === 0) {
-          clearInterval(this.clock);
-          resolve(this.secondCount);
-        }
-        if (this.secondCount === 64) {
-          clearInterval(this.clock);
-          this.title = 'Done';
-        }
-      }, 4000);
-    })
+      }
+      console.log("second: " + this.secondCount);
+    }, 4000);
   }
 
   inhaleAnimation() {
@@ -113,7 +90,7 @@ export class HomePage implements OnInit {
       .duration(4000)
       .fromTo('transform', 'scale(1)', 'scale(1.3)')
       .fromTo('opacity', '0.7', '1')
-      .fromTo('--border-width', '20px', '0px');
+      // .fromTo('--border-width', '20px', '0px');
 
     animation.play();
   }
@@ -124,7 +101,7 @@ export class HomePage implements OnInit {
       .duration(4000)
       .fromTo('transform', 'scale(1.3)', 'scale(1)')
       .fromTo('opacity', '1', '0.7')
-      .fromTo('--border-width', '0px', '20px');
+      // .fromTo('--border-width', '0px', '20px');
 
     animation.play();
   }
