@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AnimationController } from '@ionic/angular';
+// import { AnimationController } from '@ionic/angular';
+import { animate, AnimationBuilder, style } from "@angular/animations";
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,10 @@ export class HomePage implements OnInit {
   secondCount: number = 0;
   clock;
 
-  constructor(private animationCtrl: AnimationController) { }
+  constructor(
+    // private animationCtrl: AnimationController
+    private animationBuilder: AnimationBuilder
+  ) { }
 
   ngOnInit() {
     if (window.screen.height < 667) { // iPhone 5/SE , Galaxy S5
@@ -85,24 +89,40 @@ export class HomePage implements OnInit {
   }
 
   inhaleAnimation() {
-    const animation = this.animationCtrl.create()
-      .addElement(this.button.nativeElement)
-      .duration(4000)
-      .fromTo('transform', 'scale(1)', 'scale(1.3)')
-      .fromTo('opacity', '0.7', '1')
-      // .fromTo('--border-width', '20px', '0px');
+    const inhale = this.animationBuilder.build([
+      style({ transform: 'scale(1)', opacity: 0.7 }),
+      animate(4000, style({ transform: 'scale(1.3)', opacity: 1 }))
+    ]);
 
+    const animation = inhale.create(this.button.nativeElement);
     animation.play();
+
+    //   const animation = this.animationCtrl.create()
+    //     .addElement(this.button.nativeElement)
+    //     .duration(4000)
+    //     .fromTo('transform', 'scale(1)', 'scale(1.3)')
+    //     .fromTo('opacity', '0.7', '1')
+    //     // .fromTo('--border-width', '20px', '0px');
+
+    //   animation.play();
   }
 
   exhaleAnimation() {
-    const animation = this.animationCtrl.create()
-      .addElement(this.button.nativeElement)
-      .duration(4000)
-      .fromTo('transform', 'scale(1.3)', 'scale(1)')
-      .fromTo('opacity', '1', '0.7')
-      // .fromTo('--border-width', '0px', '20px');
+    const exhale = this.animationBuilder.build([
+      style({ transform: 'scale(1.3)', opacity: 1 }),
+      animate(4000, style({ transform: 'scale(1)', opacity: 0.7 }))
+    ]);
 
+    const animation = exhale.create(this.button.nativeElement);
     animation.play();
+    
+    //   const animation = this.animationCtrl.create()
+    //     .addElement(this.button.nativeElement)
+    //     .duration(4000)
+    //     .fromTo('transform', 'scale(1.3)', 'scale(1)')
+    //     .fromTo('opacity', '1', '0.7')
+    //     // .fromTo('--border-width', '0px', '20px');
+
+    //   animation.play();
   }
 }
